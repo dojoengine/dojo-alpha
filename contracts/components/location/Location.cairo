@@ -44,12 +44,10 @@ func set{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
     // check init
 
     // cast data to struct so we can store it
-    // TODO: CAST FUNCTION HERE - we need to cast the data to the struct
+    // we offset data by two so we only store new location
+    let loc: ComponentStruct = Utils.arr_to_component_struct(2, data + 2);
 
-    let x = data[0];
-    let y = data[1];
-
-    component.write(entity, ComponentStruct(x, y));
+    component.write(entity, loc);
 
     // call World with state update to trigger event
     let (world_address) = World.get_world_address();
