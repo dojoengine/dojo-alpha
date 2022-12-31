@@ -1,16 +1,40 @@
 # Cairo DOJO
 
-A Monorepo containing:
-
-- [x] Cairo ECS System
+- [x] Cairo 0.10 ECS System
 - [x] Dockerised Devnet
-- [] Bevy Game client
+- [ ] Rust testing client
+- [ ] Proxy server to relay client requests to networks
+- [ ] Bevy game client example
+- [ ] Cairo 1 ECS system
 
-Create StarkNet env then
+## Cairo ECS
+
+Develop Cairo with:
 
 ```
+// Create StarkNet env then
 source ~/cairo_venv/bin/activate
 ```
+
+## Apibara + Devnet
+
+```
+docker-compose up
+```
+
+## Proxy
+
+You will need rust installed. Then run the docker then these commands:
+
+```
+// Starts server and connects to devnet
+cargo run --bin helloworld-server
+
+// Test client to ping server. This just exists for testing
+cargo run --bin helloworld-client
+```
+
+# Theory
 
 ## What's an Entity-Component-System (ECS)?
 
@@ -65,11 +89,6 @@ Since StarkNet has a lot of gaming projects, let's see if we can build an ECS sy
 - Need an indexing system to stream events, we'll use Ceccon's Apibara https://www.apibara.com/. Repo for devnet + apibara here: https://gist.github.com/fracek/a087ebf776aaa29aa40717abd259a084
 - See if we can integrate Jun's work on DIP (Full-Rust Web3 application toolkit focus on, ECS based event-driven development): https://github.com/diptools/dip
 - After all is said and built we'll need ECS to run on application-specific rollups or L3s. Slush is an excellent candidate: https://github.com/slushsdk/slush/releases/tag/v0.2.0
-
-- [x] loaf's initial thoughts & design
-- [ ] Initial Architecture in Cairo as a POC
-- [ ] Cairo 1 implementation potentially mirroring [Bevy Engine](https://bevyengine.org/) design patterns, leveraging Cairo 1 Rust-esk patterns
-- [ ] A DOJO - A self contained on-chain game enviroment for fast iterations and testings. Create and destroy quickly
 
 # Resources
 
