@@ -9,10 +9,18 @@ service Greeter {
 }
 
 message ExecuteRequest {
-    string system_guid = 1;
-    string entity = 2;
-    int32 data_len = 3;
-    repeated string data = 4;
+    // tx data
+    string sender_address = 1;
+    repeated string signature = 2;
+    string max_fee = 3;
+    string nonce = 4;
+    string version = 5;
+    // call data
+    string world_address = 6;
+    string system_guid = 7;
+    string entity = 8;
+    string data_len = 9;
+    repeated string data = 10;
 }
 
 message ExecuteResponse {

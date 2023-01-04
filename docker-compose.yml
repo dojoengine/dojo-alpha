@@ -4,6 +4,8 @@ services:
     image: shardlabs/starknet-devnet:latest
     ports:
     - 5050:5050
+    command:
+    - "--fork-network=alpha-goerli"
 
   apibara:
     image: apibara/starknet:4ec887d226eb654b2310edf81010e8e12dd08a7c
