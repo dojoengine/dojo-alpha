@@ -33,53 +33,38 @@ impl Greeter for MyGreeter {
     ) -> Result<Response<ExecuteResponse>, Status> {
         let inner_request = request.into_inner();
 
+        let proxy_local_tx = &BroadcastedInvokeTransaction::V1(BroadcastedInvokeTransactionV1 {
+            max_fee: FieldElement::ONE,
+            signature: vec![
+                FieldElement::from_hex_be(
+                    "156a781f12e8743bd07e20a4484154fd0baccee95d9ea791c121c916ad44ee0",
+                )
+                .unwrap(),
+                FieldElement::from_hex_be(
+                    "7228267473c670cbb86a644f8696973db978c51acde19431d3f1f8f100794c6",
+                )
+                .unwrap(),
+            ],
+            nonce: FieldElement::from_hex_be(&inner_request.nonce).unwrap(),
+            sender_address: FieldElement::from_hex_be(&inner_request.sender_address).unwrap(),
+            calldata: vec![FieldElement::from_hex_be("1").unwrap()],
+        });
+
         let rpc_client = create_jsonrpc_client();
 
         let proxy_tx = rpc_client
-            .add_invoke_transaction(&BroadcastedInvokeTransaction::V1(
-                BroadcastedInvokeTransactionV1 {
-                    max_fee: FieldElement::ONE,
-                    signature: vec![
-                        FieldElement::from_hex_be(
-                            "156a781f12e8743bd07e20a4484154fd0baccee95d9ea791c121c916ad44ee0",
-                        )
-                        .unwrap(),
-                        FieldElement::from_hex_be(
-                            "7228267473c670cbb86a644f8696973db978c51acde19431d3f1f8f100794c6",
-                        )
-                        .unwrap(),
-                    ],
-                    nonce: FieldElement::from_hex_be(&inner_request.nonce).unwrap(),
-                    sender_address: FieldElement::from_hex_be(&inner_request.sender_address)
-                        .unwrap(),
-                    calldata: vec![
-                        FieldElement::from_hex_be("1").unwrap(),
-                        FieldElement::from_hex_be(
-                            "7394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10",
-                        )
-                        .unwrap(),
-                        FieldElement::from_hex_be(
-                            "2f0b3c5710379609eb5495f1ecd348cb28167711b73609fe565a72734550354",
-                        )
-                        .unwrap(),
-                        FieldElement::from_hex_be("0").unwrap(),
-                        FieldElement::from_hex_be("3").unwrap(),
-                        FieldElement::from_hex_be("3").unwrap(),
-                        FieldElement::from_hex_be(
-                            "5b5e9f6f6fb7d2647d81a8b2c2b99cbc9cc9d03d705576d7061812324dca5c0",
-                        )
-                        .unwrap(),
-                        FieldElement::from_hex_be("3635c9adc5dea00000").unwrap(),
-                        FieldElement::from_hex_be("0").unwrap(),
-                    ],
-                },
-            ))
+            .add_invoke_transaction(proxy_local_tx)
+            .await
+            .unwrap();
+
+        let starknet_tx = rpc_client
+            .add_invoke_transaction(proxy_local_tx)
             .await
             .unwrap();
 
         dbg!(proxy_tx);
 
-        // dbg!(call_result);
+        dbg!(starknet_tx);
 
         println!("Call indexer");
 
