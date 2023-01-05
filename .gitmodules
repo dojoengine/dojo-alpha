@@ -1,0 +1,3 @@
+[submodule "dojo_core"]
+	path = examples/snake/lib/dojo_core
+	url = https://github.com/dojo-on-chain/dojo-core
