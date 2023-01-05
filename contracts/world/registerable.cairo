@@ -13,42 +13,45 @@ from contracts.world.IWorld import IWorld
 // Contains helper Auth functions for the World.
 
 @storage_var
-func world_address() -> (address: felt) {
+func Registerable_world_address() -> (address: felt) {
 }
 
-namespace World {
+namespace Registerable {
     // set world
-    func set_world_address{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
-        value: felt
+    func initialize{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
+        world_address: felt
     ) {
-        world_address.write(value);
+        let (existing_world_address) = Registerable_world_address.read();
+        with_attr error_message("Registerable: already initialized") {
+            assert existing_world_address = 0;
+        }
+
+        Registerable_world_address.write(world_address);
         return ();
     }
 
-    // get world
     func get_world_address{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}() -> (
         address: felt
     ) {
-        return world_address.read();
+        return Registerable_world_address.read();
     }
 
     // @notice: assert caller is world
     func assert_caller_is_world{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}() {
         let caller_address = get_caller_address();
-        let world_address = world_address.read();
+        let world_address = Registerable_world_address.read();
 
         assert caller_address = world_address;
 
-        return world_address.read();
+        return Registerable_world_address.read();
     }
 
     // @notice: register component/system in the world
     func register{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
-        guid: felt, ecs_type: felt
+        id: felt, ecs_type: felt
     ) {
-        let (world_address) = get_world_address();
-        let (contract_address) = get_contract_address();
-        IWorld.register(world_address, contract_address, guid, ecs_type);
+        let (world_addr) = get_world_address();
+        IWorld.register(world_addr, id, ecs_type);
         return ();
     }
 
@@ -57,7 +60,6 @@ namespace World {
     ) -> felt {
         let (world_address) = get_world_address();
         let (component_address) = IWorld.get_address_by_id(world_address, id);
-
         return (component_address);
     }
 }

@@ -3,6 +3,7 @@
 from starkware.cairo.common.alloc import alloc
 from starkware.cairo.common.cairo_builtins import BitwiseBuiltin, HashBuiltin
 from starkware.cairo.common.bool import TRUE, FALSE
+from starkware.starknet.common.syscalls import get_caller_address
 
 from contracts.constants.Constants import Entity
 
@@ -50,9 +51,10 @@ func constructor{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr
 // @param: ecs_type: the type of the entity
 @external
 func register{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
-    ecs_address: felt, guid: felt, ecs_type: felt
+    guid: felt, ecs_type: felt
 ) {
-    RegisterSystem.register(ecs_address, guid, ecs_type);
+    let (caller_address) = get_caller_address();
+    RegisterSystem.register(caller_address, guid, ecs_type);
     return ();
 }
 
@@ -63,7 +65,7 @@ func register{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
 // @param: data: the data to set
 @external
 func register_component_value_set{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
-    entity_guid: felt, component: felt, data_len: felt, data: felt*
+    entity_guid: felt, component_id: felt, data_len: felt, data: felt*
 ) {
     alloc_locals;
     // TODO: check Component is registered in world
@@ -71,7 +73,7 @@ func register_component_value_set{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*
 
     // set 0 here for now - we could pass an address in the future to set an address for the entity
     RegisterSystem.set(0, entity_guid);
-    ComponentValueSet.emit(entity_guid, component, data_len, data);
+    ComponentValueSet.emit(entity_guid, component_id, data_len, data);
     return ();
 }
 

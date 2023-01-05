@@ -8,7 +8,7 @@ namespace IWorld {
     }
     func get_address_by_id(ecs_address: felt) -> (address: felt) {
     }
-    func register(address: felt, guid: felt, ecs_type: felt) {
+    func register(id: felt, ecs_type: felt) {
     }
 
     func execute(system_guid: felt, entity: felt, data_len: felt, data: felt*) {
