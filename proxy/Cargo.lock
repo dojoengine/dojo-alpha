@@ -584,10 +584,12 @@ name = "helloworld-tonic"
 version = "0.1.0"
 dependencies = [
  "prost",
+ "serde_json",
  "starknet",
  "tokio",
  "tonic",
  "tonic-build",
+ "url",
 ]
 
 [[package]]

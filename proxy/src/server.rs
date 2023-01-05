@@ -1,12 +1,16 @@
 use starknet::{
-    core::types::{BlockId, CallFunction, FieldElement},
-    macros::{felt, selector},
-    providers::{Provider, SequencerGatewayProvider},
+    core::types::FieldElement,
+    providers::jsonrpc::{
+        models::{BroadcastedInvokeTransaction, BroadcastedInvokeTransactionV1},
+        HttpTransport, JsonRpcClient,
+    },
 };
 use tonic::{transport::Server, Request, Response, Status};
 
 use hello_world::greeter_server::{Greeter, GreeterServer};
 use hello_world::{ExecuteRequest, ExecuteResponse};
+
+use url::Url;
 
 pub mod hello_world {
     tonic::include_proto!("helloworld"); // The string specified here must match the proto package name
@@ -15,54 +19,67 @@ pub mod hello_world {
 #[derive(Debug, Default)]
 pub struct MyGreeter {}
 
+fn create_jsonrpc_client() -> JsonRpcClient<HttpTransport> {
+    JsonRpcClient::new(HttpTransport::new(
+        Url::parse("http://127.0.0.1:5050/rpc").unwrap(),
+    ))
+}
+
 #[tonic::async_trait]
 impl Greeter for MyGreeter {
     async fn execute(
         &self,
         request: Request<ExecuteRequest>,
     ) -> Result<Response<ExecuteResponse>, Status> {
-        let inner_request = request.into_inner().clone();
+        let inner_request = request.into_inner();
 
-        let devnet_provider = SequencerGatewayProvider::starknet_nile_localhost();
+        let rpc_client = create_jsonrpc_client();
 
-        let testnet_provider = SequencerGatewayProvider::starknet_nile_localhost();
-
-        let call_data = vec![
-            FieldElement::from_hex_be(&inner_request.system_guid).unwrap(),
-            FieldElement::from_hex_be(&inner_request.entity).unwrap(),
-            FieldElement::from_hex_be(&inner_request.data_len).unwrap(),
-            // data
-        ];
-
-        let dev_call_result = devnet_provider
-            .call_contract(
-                CallFunction {
-                    contract_address: FieldElement::from_hex_be(&inner_request.system_guid)
+        let proxy_tx = rpc_client
+            .add_invoke_transaction(&BroadcastedInvokeTransaction::V1(
+                BroadcastedInvokeTransactionV1 {
+                    max_fee: FieldElement::ONE,
+                    signature: vec![
+                        FieldElement::from_hex_be(
+                            "156a781f12e8743bd07e20a4484154fd0baccee95d9ea791c121c916ad44ee0",
+                        )
                         .unwrap(),
-                    entry_point_selector: selector!("execute"),
-                    calldata: (*call_data).to_vec(),
-                },
-                BlockId::Latest,
-            )
-            .await
-            .expect("failed to call contract");
-
-        let call_result = testnet_provider
-            .call_contract(
-                CallFunction {
-                    contract_address: FieldElement::from_hex_be(&inner_request.system_guid)
+                        FieldElement::from_hex_be(
+                            "7228267473c670cbb86a644f8696973db978c51acde19431d3f1f8f100794c6",
+                        )
                         .unwrap(),
-                    entry_point_selector: selector!("execute"),
-                    calldata: (*call_data).to_vec(),
+                    ],
+                    nonce: FieldElement::from_hex_be(&inner_request.nonce).unwrap(),
+                    sender_address: FieldElement::from_hex_be(&inner_request.sender_address)
+                        .unwrap(),
+                    calldata: vec![
+                        FieldElement::from_hex_be("1").unwrap(),
+                        FieldElement::from_hex_be(
+                            "7394cbe418daa16e42b87ba67372d4ab4a5df0b05c6e554d158458ce245bc10",
+                        )
+                        .unwrap(),
+                        FieldElement::from_hex_be(
+                            "2f0b3c5710379609eb5495f1ecd348cb28167711b73609fe565a72734550354",
+                        )
+                        .unwrap(),
+                        FieldElement::from_hex_be("0").unwrap(),
+                        FieldElement::from_hex_be("3").unwrap(),
+                        FieldElement::from_hex_be("3").unwrap(),
+                        FieldElement::from_hex_be(
+                            "5b5e9f6f6fb7d2647d81a8b2c2b99cbc9cc9d03d705576d7061812324dca5c0",
+                        )
+                        .unwrap(),
+                        FieldElement::from_hex_be("3635c9adc5dea00000").unwrap(),
+                        FieldElement::from_hex_be("0").unwrap(),
+                    ],
                 },
-                BlockId::Latest,
-            )
+            ))
             .await
-            .expect("failed to call contract");
+            .unwrap();
 
-        dbg!(dev_call_result);
+        dbg!(proxy_tx);
 
-        dbg!(call_result);
+        // dbg!(call_result);
 
         println!("Call indexer");
 

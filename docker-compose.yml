@@ -8,7 +8,7 @@ services:
     - "--fork-network=alpha-goerli"
 
   apibara:
-    image: apibara/starknet:4ec887d226eb654b2310edf81010e8e12dd08a7c
+    image: apibara/starknet:c9e43f3d165eea7abf69ebc916ca4adc892b8d04
     ports:
     - 7171:7171
     # apibara requires devnet to be available, which is not always the case
@@ -20,6 +20,5 @@ services:
     command:
     - "/usr/local/bin/apibara-starknet"
     - "start"
-    - "--datadir=/data"
     - "--poll-interval=1" # change this parameter to something lower for faster refreshing data
-    - "--custom-network=http://devnet:5050"
+    - "--rpc=http://devnet:5050/rpc"

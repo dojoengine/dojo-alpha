@@ -1,5 +1,9 @@
 {
   "dependencies": {
-    "grpc-web": "^1.4.2"
+    "@apibara/protocol": "^0.4.0-next.0",
+    "@apibara/starknet": "^0.2.0-next.0",
+    "decimal.js": "^10.4.3",
+    "grpc-web": "^1.4.2",
+    "starknet": "^4.17.1"
   }
 }
