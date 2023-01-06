@@ -12,24 +12,36 @@ func __setup__{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
 
     // Deploy contracts
     local world_address: felt;
+    local chomp_class_hash: felt;
     local move_class_hash: felt;
+    local consumable_class_hash: felt;
     local position_class_hash: felt;
     %{
         context.world_address = deploy_contract("../../contracts/World.cairo", []).contract_address
         ids.world_address = context.world_address
 
+        context.chomp_class_hash = declare("./src/systems/Chomp.cairo").class_hash
+        ids.chomp_class_hash = context.chomp_class_hash
+
         context.move_class_hash = declare("./src/systems/Move.cairo").class_hash
         ids.move_class_hash = context.move_class_hash
+
+        context.consumable_class_hash = declare("./src/components/Consumable.cairo").class_hash
+        ids.consumable_class_hash = context.consumable_class_hash
 
         context.position_class_hash = declare("./src/components/Position.cairo").class_hash
         ids.position_class_hash = context.position_class_hash
     %}
 
     let (empty_calldata) = alloc();
+    let (chomp_address) = IWorld.register(world_address, chomp_class_hash, 0, empty_calldata);
     let (move_address) = IWorld.register(world_address, move_class_hash, 0, empty_calldata);
+    let (consumable_address) = IWorld.register(world_address, consumable_class_hash, 0, empty_calldata);
     let (position_address) = IWorld.register(world_address, position_class_hash, 0, empty_calldata);
 
-    // Grant move system write access to position component.
+    // Grant `chomp` system write access to `consumable` component.
+    IComponent.grant_writer(consumable_address, chomp_address);
+    // Grant `move` system write access to `position` component.
     IComponent.grant_writer(position_address, move_address);
 
     return ();

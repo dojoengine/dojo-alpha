@@ -5,4 +5,6 @@ cairo-path = ["../.."]
 
 [contracts]
 position = ["src/components/Position.cairo"]
+consumable = ["src/components/Consumable.cairo"]
+chomp = ["src/systems/Chomp.cairo"]
 move = ["src/systems/Move.cairo"]
