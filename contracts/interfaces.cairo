@@ -12,6 +12,8 @@ namespace IWorld {
     }
     func execute(system_guid: felt, entity: felt, data_len: felt, data: felt*) {
     }
+    func spawn(components_len: felt, components: felt*) -> (id: felt) {
+    }
 }
 
 @contract_interface

@@ -47,4 +47,10 @@ namespace Registerable {
         let (component_address) = IWorld.lookup(world_address, key);
         return (component_address);
     }
+
+    func spawn{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(components_len: felt, components: felt*) {
+        let (world_address) = get_world_address();
+        IWorld.spawn(world_address, components_len, components);
+        return ();
+    }
 }

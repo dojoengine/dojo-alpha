@@ -4,7 +4,7 @@ from starkware.cairo.common.alloc import alloc
 from starkware.cairo.common.cairo_builtins import HashBuiltin
 from starkware.cairo.common.math import assert_not_zero
 
-from contracts.interfaces import IWorld
+from contracts.interfaces import IComponent, IWorld
 from contracts.libraries.registerable import Registerable
 from contracts.libraries.erc165 import ERC165
 
@@ -18,6 +18,30 @@ namespace System {
         Registerable.initialize(world_address);
         ERC165.register_interface(INTERFACE_ID);
         return ();
+    }
+
+    func set_inner{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
+        entity_id: felt, components_len: felt, components: felt*, components_set_calldata_len: felt, components_set_calldata: felt*
+    ) -> () {
+        if (components_len == 0) {
+            return ();
+        }
+
+        let component_address = components[0];
+        let calldata_len = components_set_calldata[0];
+        let calldata = components_set_calldata + 1;
+
+        IComponent.set(component_address, calldata_len, calldata);
+
+        return set_inner(entity_id, components_len - 1, components + 1, components_set_calldata_len - calldata_len - 1, components_set_calldata + calldata_len + 1);
+    }
+
+    // Spawn an entity with a set of components.
+    // [component_address_0, setdata_len_0, setdata_0, ..., component_address_n, setdata_len_n, setdata_n]
+    func spawn{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(components_len: felt, components: felt*, components_set_calldata_len: felt, components_set_calldata: felt*) -> (id: felt) {
+        let id = Registerable.spawn(components_len, components);
+        set_inner(id, components_len, components, components_set_calldata_len, components_set_calldata);
+        return (id=id);
     }
 
     func supports_interface{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
