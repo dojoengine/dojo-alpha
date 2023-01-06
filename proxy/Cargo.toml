@@ -11,10 +11,6 @@ path = "src/server.rs"
 name = "helloworld-client"
 path = "src/client.rs"
 
-[[bin]] # Bin to run the HelloWorld gRPC client
-name = "deploy-world"
-path = "deploy/deploy.rs"
-
 [dependencies]
 serde_json = "1.0.74"
 tonic = "0.8"

@@ -6,6 +6,7 @@ services:
     - 5050:5050
     command:
     - "--fork-network=alpha-goerli"
+    - "--seed=1831837740"
 
   apibara:
     image: apibara/starknet:c9e43f3d165eea7abf69ebc916ca4adc892b8d04

@@ -57,14 +57,14 @@ impl Greeter for MyGreeter {
             .await
             .unwrap();
 
-        let starknet_tx = rpc_client
-            .add_invoke_transaction(proxy_local_tx)
-            .await
-            .unwrap();
+        // let starknet_tx = rpc_client
+        //     .add_invoke_transaction(proxy_local_tx)
+        //     .await
+        //     .unwrap();
 
         dbg!(proxy_tx);
 
-        dbg!(starknet_tx);
+        // dbg!(starknet_tx);
 
         println!("Call indexer");
 
