@@ -1,6 +1,6 @@
 The `World` contract exists primarily as a central entrypoint to an onchain world:
  - Manages component / system registry to simplify lookups.
- - Manages entity issuance and ownership.
+ - Manages provisioning autoincremented entity ids.
  - Serves as event mux for all components and systems in the world.
 
 The world exposes the following interface:

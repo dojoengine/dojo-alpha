@@ -2,7 +2,7 @@
 from starkware.cairo.common.alloc import alloc
 from starkware.cairo.common.cairo_builtins import HashBuiltin
 
-from contracts.interfaces import IWorld
+from contracts.interfaces import IComponent, IWorld
 from src.systems.Move import IMove, ID as MoveID
 from src.components.Position import IPosition, Position, ID as PositionID
 
@@ -26,8 +26,11 @@ func __setup__{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
     %}
 
     let (empty_calldata) = alloc();
-    IWorld.register(world_address, position_class_hash, 0, empty_calldata);
-    IWorld.register(world_address, move_class_hash, 0, empty_calldata);
+    let (move_address) = IWorld.register(world_address, move_class_hash, 0, empty_calldata);
+    let (position_address) = IWorld.register(world_address, position_class_hash, 0, empty_calldata);
+
+    // Grant move system write access to position component.
+    IComponent.grant_writer(position_address, move_address);
 
     return ();
 }

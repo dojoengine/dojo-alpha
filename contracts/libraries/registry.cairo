@@ -34,10 +34,6 @@ func Registry_entity_count() -> (value: felt) {
 }
 
 @storage_var
-func Registry_entity_ownership(id: felt) -> (owner: felt) {
-}
-
-@storage_var
 func Registry_entity_components(id: felt, idx: felt) -> (part: felt) {
 }
 
