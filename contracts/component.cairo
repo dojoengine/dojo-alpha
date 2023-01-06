@@ -52,13 +52,12 @@ namespace Component {
         entity_id: felt, data_len: felt, data: felt*
     ) {
         alloc_locals;
-
-        let world_address = assert_world_address();
-        // authorize
+        Writable.assert_only_writer();
 
         Component_state.write(entity_id, 0, data_len);
         write_inner(entity_id, 0, data_len, data);
 
+        let world_address = assert_world_address();
         IWorld.register_component_value_set(world_address, entity_id, 'id', data_len, data);
 
         return ();
