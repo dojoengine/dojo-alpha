@@ -28,13 +28,9 @@ func __setup__() {
     return ();
 }
 
-func register_and_assert_contract{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
+func assert_registration_of_entity{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
     world_address: felt, contract_to_register: felt, guid: felt, ecs_type: felt
 ) {
-    IWorld.register(
-        contract_address=world_address, address=contract_to_register, guid=guid, ecs_type=ecs_type
-    );
-
     let (registered_address) = IWorld.get_address_by_id(world_address, guid);
 
     assert contract_to_register = registered_address;
@@ -54,7 +50,7 @@ func test__world_should_register_system{
     %{ ids.world_address = context.world_address %}
     %{ ids.move_address = context.move_address %}
 
-    register_and_assert_contract(world_address, move_address, ExampleMoveId, ECS_TYPE.SYSTEM);
+    assert_registration_of_entity(world_address, move_address, ExampleMoveId, ECS_TYPE.SYSTEM);
 
     return ();
 }
@@ -71,7 +67,7 @@ func test__world_should_register_component{
     %{ ids.world_address = context.world_address %}
     %{ ids.location_address = context.location_address %}
 
-    register_and_assert_contract(
+    assert_registration_of_entity(
         world_address, location_address, ExampleLocationId, ECS_TYPE.COMPONENT
     );
 
@@ -97,8 +93,7 @@ func test__world_should_execute_system{
     assert [test_data + 1] = 0;
     assert [test_data + 2] = 0;
     assert [test_data + 3] = 1;
-    test__world_should_register_system();
-    test__world_should_register_component();
+
     %{
         expect_events({"name": "ComponentValueSet", "data": 
            [2, # entity guid

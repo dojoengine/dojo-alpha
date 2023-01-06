@@ -23,6 +23,7 @@ func constructor{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr
     world_address: felt
 ) {
     World.set_world_address(world_address);
+    register();
     return ();
 }
 
