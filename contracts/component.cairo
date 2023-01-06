@@ -4,9 +4,12 @@ from starkware.cairo.common.alloc import alloc
 from starkware.cairo.common.cairo_builtins import HashBuiltin
 from starkware.cairo.common.math import assert_not_zero
 
-from contracts.constants.Constants import ECS_TYPE
-from contracts.world.IWorld import IWorld
-from contracts.world.registerable import Registerable
+from contracts.interfaces import IWorld
+from contracts.libraries.registerable import Registerable
+from contracts.libraries.erc165 import ERC165
+
+// TODO: Compute component interface id
+const INTERFACE_ID = 0xdead;
 
 @storage_var
 func Component_state(entity_id: felt, part_idx: felt) -> (part: felt) {
@@ -14,11 +17,17 @@ func Component_state(entity_id: felt, part_idx: felt) -> (part: felt) {
 
 namespace Component {
     func initialize{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
-        world_address: felt, component_id: felt
+        world_address: felt
     ) {
         Registerable.initialize(world_address);
-        IWorld.register(world_address, component_id, ECS_TYPE.COMPONENT);
+        ERC165.register_interface(INTERFACE_ID);
         return ();
+    }
+
+    func supports_interface{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
+        interface_id: felt
+    ) -> (success: felt) {
+        return ERC165.supports_interface(interface_id);
     }
 
     func write_inner{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(

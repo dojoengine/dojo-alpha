@@ -4,20 +4,20 @@ from starkware.cairo.common.alloc import alloc
 from starkware.cairo.common.cairo_builtins import HashBuiltin
 from starkware.cairo.common.math_cmp import is_le
 
-from contracts.constants.Constants import ECS_TYPE
-
-from contracts.world.registerable import Registerable
-from contracts.world.IWorld import IWorld
+from contracts.interfaces import IWorld
+from contracts.system import System
+from contracts.libraries.erc165 import ERC165
+from contracts.libraries.registerable import Registerable
 
 from src.components.Position import IPosition, Position, ID as PositionID
 
-const ID = 'snake.system.Move';
+const ID = 'system.Move';
 
 const MAP_SIZE = 100;
 
 @contract_interface
 namespace IMove {
-    func initialize(world_address: felt) {
+    func initialize(world_address: felt, calldata_len: felt, calldata: felt*) {
     }
 
     func execute(entity_id: felt, next_position_len: felt, next_position: Position*) {
@@ -26,10 +26,9 @@ namespace IMove {
 
 @external
 func initialize{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
-    world_address: felt
+    world_address: felt, calldata_len: felt, calldata: felt*
 ) {
-    Registerable.initialize(world_address);
-    Registerable.register(ID, ECS_TYPE.SYSTEM);
+    System.initialize(world_address);
     return ();
 }
 
@@ -42,7 +41,7 @@ func execute{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
     // TODO: Assert Caller is World / Admin / Approved System
     // World.assert_caller_is_world();
 
-    let position_address = Registerable.get_address_by_id(PositionID);
+    let position_address = Registerable.lookup(PositionID);
     let (_, current_position) = IPosition.get(position_address, entity_id);
 
     // check valid
@@ -70,6 +69,16 @@ func assert_valid_move{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_che
     assert one_step_x + one_step_y = 1;
 
     return ();
+}
+
+@view
+func id{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}() -> (id: felt) {
+    return (id=ID);
+}
+
+@view
+func supports_interface{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(interface_id: felt) -> (success: felt) {
+    return ERC165.supports_interface(interface_id);
 }
 
 func abs_diff{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(

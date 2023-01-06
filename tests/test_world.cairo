@@ -9,7 +9,7 @@ from contracts.constants.Constants import ECS_TYPE
 from contracts.components.location.Constants import ID as ExampleLocationId
 from contracts.systems.Constants import ID as ExampleMoveId
 
-from contracts.world.IWorld import IWorld
+from contracts.interfaces import IWorld
 
 @external
 func __setup__() {

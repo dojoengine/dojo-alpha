@@ -6,8 +6,9 @@ from starkware.cairo.common.cairo_builtins import HashBuiltin
 from starkware.cairo.lang.compiler.lib.registers import get_fp_and_pc
 
 from contracts.component import Component
+from contracts.libraries.erc165 import ERC165
 
-const ID = 'snake.component.Location';
+const ID = 'component.Location';
 
 struct Position {
     x: felt,
@@ -16,7 +17,7 @@ struct Position {
 
 @contract_interface
 namespace IPosition {
-    func initialize(world_address: felt) {
+    func initialize(world_address: felt, calldata_len: felt, calldata: felt*) {
     }
 
     func set(entity_id: felt, position_len: felt, position: Position*) {
@@ -28,9 +29,9 @@ namespace IPosition {
 
 @external
 func initialize{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
-    world_address: felt
+    world_address: felt, calldata_len: felt, calldata: felt*
 ) {
-    Component.initialize(world_address, ID);
+    Component.initialize(world_address);
     return ();
 }
 
@@ -70,4 +71,14 @@ func get{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(entity
     assert position.x = data[0];
     assert position.y = data[1];
     return (position_len=1, position=position);
+}
+
+@view
+func id{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}() -> (id: felt) {
+    return (id=ID);
+}
+
+@view
+func supports_interface{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(interface_id: felt) -> (success: felt) {
+    return ERC165.supports_interface(interface_id);
 }
