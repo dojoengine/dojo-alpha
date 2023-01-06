@@ -1,9 +1,20 @@
 {
+  "name": "simple-client-example",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint src --ext .ts",
+    "start": "node dist/main.js",
+    "lint:fix": "eslint --fix src --ext .ts"
+  },
   "dependencies": {
-    "@apibara/protocol": "^0.4.0-next.0",
-    "@apibara/starknet": "^0.2.0-next.0",
+    "@apibara/protocol": "workspace:*",
+    "@apibara/starknet": "workspace:*",
     "decimal.js": "^10.4.3",
-    "grpc-web": "^1.4.2",
     "starknet": "^4.17.1"
-  }
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.9"
+  },
+  "version": "0.1.0"
 }

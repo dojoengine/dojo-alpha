@@ -17,12 +17,9 @@ pub mod hello_world {
 }
 
 // Account #0 - NOTE: This is just devnet account, not a real one
-pub const ADDRESS: &str = "0x605d49242d6d1476d93f2282900e05ec3120f796b03f238bd8a339005363d49";
+const ADDRESS: &str = "0x605d49242d6d1476d93f2282900e05ec3120f796b03f238bd8a339005363d49";
 // const PUBLIC: &str = "0x2a4433c15f014f4b8db9ae3eb8ba85a089ac22fdcc0c38e534dc8a2c471572f";
 const PRIVATE: &str = "0x6d1fa9062223bccdb8db99ff53b8d820";
-
-const NONCE: &str = "1";
-const MAX_FEE: &str = "1";
 
 const TESTNET_ETH_ADDRESS: &str =
     "0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7";

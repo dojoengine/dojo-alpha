@@ -35,21 +35,8 @@ pub const ADDRESS_2: &str = "0x6e65ff327121a4fdfacc538bf5b8abef39015aad7777a0295
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let provider = SequencerGatewayProvider::starknet_nile_localhost();
-
-    let call_result = provider
-        .call_contract(
-            CallFunction {
-                contract_address: FieldElement::from_hex_be(TESTNET_ETH_ADDRESS).unwrap(),
-                entry_point_selector: selector!("balanceOf"),
-                calldata: vec![FieldElement::from_hex_be(ADDRESS_2).unwrap()],
-            },
-            starknet::core::types::BlockId::Latest,
-        )
-        .await
-        .expect("failed to call contract");
-
-    dbg!(call_result);
+    // get balance
+    balanceOf(ADDRESS_2).await?;
 
     let mut client = GreeterClient::connect("http://[::1]:50051").await?;
 
@@ -80,14 +67,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("RESPONSE={:?}", response);
 
-    // get Balance
+    // get balance
+    balanceOf(ADDRESS_2).await?;
+
+    Ok(())
+}
+
+async fn balanceOf(address: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let provider = SequencerGatewayProvider::starknet_nile_localhost();
 
     let call_result = provider
         .call_contract(
             CallFunction {
                 contract_address: FieldElement::from_hex_be(TESTNET_ETH_ADDRESS).unwrap(),
                 entry_point_selector: selector!("balanceOf"),
-                calldata: vec![FieldElement::from_hex_be(ADDRESS_2).unwrap()],
+                calldata: vec![FieldElement::from_hex_be(address).unwrap()],
             },
             starknet::core::types::BlockId::Latest,
         )
