@@ -11,8 +11,8 @@ move_system = ["contracts/systems/Move.cairo"]
 [profile.devnet.project]
 gateway-url = "http://127.0.0.1:5050/"
 chain-id = 1536727068981429685321
-private-key-path = "./.env"
-account-address=""  
+private-key-path = "./.env_devnet"
+account-address="0x605d49242d6d1476d93f2282900e05ec3120f796b03f238bd8a339005363d49"  
 
 [profile.testnet.project]
 network="testnet"

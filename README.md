@@ -16,6 +16,24 @@ Develop Cairo with:
 source ~/cairo_venv/bin/activate
 ```
 
+Build the demo contracts by running
+
+```
+protostar build
+```
+
+See (this guide)[https://docs.swmansion.com/protostar/docs/tutorials/installation] for how to install protostar.
+
+
+Deploy demo contracts by updating the `protostar.toml` profile that you want to deploy to {testnet, testnet2, devnet}. You will need to locally define the `account-address` field to the address you want to deploy from and the `private-key-path` to the file where you will write the private key of the account address you choose.
+
+Then run
+```
+./scripts/deploy.sh <profile>
+```
+
+It will default to the profile `devnet` if none is passed into the script.
+
 ## Apibara + Devnet
 
 ```
