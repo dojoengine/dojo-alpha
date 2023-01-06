@@ -4,27 +4,33 @@ from starkware.cairo.common.alloc import alloc
 from starkware.cairo.common.segments import relocate_segment
 from starkware.cairo.common.cairo_builtins import HashBuiltin
 from starkware.cairo.lang.compiler.lib.registers import get_fp_and_pc
+from starkware.starknet.common.syscalls import get_block_timestamp
+from starkware.cairo.common.math import unsigned_div_rem
 
 from contracts.component import Component
 from contracts.libraries.erc165 import ERC165
 from contracts.libraries.writable import Writable
 
-const ID = 'component.Location';
+const ID = 'component.Consumable';
 
-struct Position {
-    x: felt,
-    y: felt,
+struct Consumable {
+    start: felt,
+    duration: felt,
+    offset: felt,
 }
 
 @contract_interface
-namespace IPosition {
+namespace IConsumable {
     func initialize(world_address: felt, calldata_len: felt, calldata: felt*) {
     }
 
-    func set(entity_id: felt, position_len: felt, position: Position*) {
+    func set(entity_id: felt, consumable_len: felt, consumable: Consumable*) {
     }
 
-    func get(entity_id: felt) -> (position_len: felt, position: Position*) {
+    func get(entity_id: felt) -> (consumable_len: felt, consumable: Consumable*) {
+    }
+
+    func epoch(entity_id: felt) -> (epoch: felt) {
     }
 }
 
@@ -36,30 +42,40 @@ func initialize{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}
     return ();
 }
 
-// TODO: Can we avoid passing by reference here? Then we wouldn't need to pass
-// the length of the struct.
 @external
 func set{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
-    entity_id: felt, position_len: felt, position: Position*
+    entity_id: felt, consumable_len: felt, consumable: Consumable*
 ) {
-    Component.set(entity_id, Position.SIZE, cast(position, felt*));
+    Component.set(entity_id, Consumable.SIZE, cast(consumable, felt*));
     return ();
 }
 
 @view
-func get{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(entity_id: felt) -> (position_len: felt, position: Position*) {
+func get{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(entity_id: felt) -> (consumable_len: felt, consumable: Consumable*) {
     let (data_len, data) = Component.get(entity_id);
-    let position: Position* = alloc();
+    let consumable: Consumable* = alloc();
 
     if (data_len == 0) {
-        assert position.x = 0;
-        assert position.y = 0;
-        return (position_len=1, position=position);
+        assert consumable.start = 0;
+        assert consumable.duration = 0;
+        assert consumable.offset = 0;
+        return (consumable_len=1, consumable=consumable);
     }
 
-    assert position.x = data[0];
-    assert position.y = data[1];
-    return (position_len=1, position=position);
+    assert consumable.start = data[0];
+    assert consumable.duration = data[1];
+    assert consumable.offset = data[2];
+    return (consumable_len=1, consumable=consumable);
+}
+
+// TODO: Update to handle reseting consumable duration when consumed.
+@view
+func epoch{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(entity_id: felt) -> (epoch: felt) {
+    let (consumable_len, p) = get(entity_id);
+    let (now) = get_block_timestamp();
+    let elapsed = now - p.start + p.offset;
+    let (epoch, _) = unsigned_div_rem(elapsed, p.duration);
+    return (epoch=epoch);
 }
 
 @view

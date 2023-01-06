@@ -95,7 +95,6 @@ namespace Registry {
         // Provision globally unique entity id.
         let (id) = Registry_entity_count.read();
         Registry_entity_count.write(id + 1);
-        Registry_entity_ownership.write(id, caller_address);
 
         // Store entities components.
         Registry_entity_components.write(id, 0, components_len);
