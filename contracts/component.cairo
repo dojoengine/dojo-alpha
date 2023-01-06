@@ -3,13 +3,18 @@
 from starkware.cairo.common.alloc import alloc
 from starkware.cairo.common.cairo_builtins import HashBuiltin
 from starkware.cairo.common.math import assert_not_zero
+from starkware.starknet.common.syscalls import get_caller_address
 
 from contracts.interfaces import IWorld
-from contracts.libraries.registerable import Registerable
+
 from contracts.libraries.erc165 import ERC165
+from contracts.libraries.registerable import Registerable
+from contracts.libraries.writable import Writable
 
 // TODO: Compute component interface id
 const INTERFACE_ID = 0xdead;
+const ADMIN_ROLE = 420;
+const WRITER_ROLE = 69;
 
 @storage_var
 func Component_state(entity_id: felt, part_idx: felt) -> (part: felt) {
@@ -19,6 +24,8 @@ namespace Component {
     func initialize{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
         world_address: felt
     ) {
+        let (caller_address) = get_caller_address();
+        Writable.initialize(caller_address);
         Registerable.initialize(world_address);
         ERC165.register_interface(INTERFACE_ID);
         return ();

@@ -34,7 +34,11 @@ func Registry_entity_count() -> (value: felt) {
 }
 
 @storage_var
-func Registry_entities(id: felt, idx: felt) -> (part: felt) {
+func Registry_entity_ownership(id: felt) -> (owner: felt) {
+}
+
+@storage_var
+func Registry_entity_components(id: felt, idx: felt) -> (part: felt) {
 }
 
 @storage_var
@@ -79,7 +83,7 @@ namespace Registry {
             return ();
         }
 
-        Registry_entities.write(entity_id, idx + 1, components[0]);
+        Registry_entity_components.write(entity_id, idx + 1, components[0]);
         return write_entity_inner(entity_id, idx + 1, components_len, components + 1);
     }
 
@@ -90,12 +94,15 @@ namespace Registry {
     ) {
         alloc_locals;
 
+        let (caller_address) = get_caller_address();
+
         // Provision globally unique entity id.
         let (id) = Registry_entity_count.read();
         Registry_entity_count.write(id + 1);
+        Registry_entity_ownership.write(id, caller_address);
 
         // Store entities components.
-        Registry_entities.write(id, 0, components_len);
+        Registry_entity_components.write(id, 0, components_len);
         write_entity_inner(id, 0, components_len, components);
 
         return (id=id);
@@ -106,7 +113,7 @@ namespace Registry {
     ) {
         alloc_locals;
 
-        let (existing_entity) = Registry_entities.read(id);
+        let (existing_entity) = Registry_entity_components.read(id);
         with_attr error_message("Registry: entity doesnt exists") {
             assert_not_zero(existing_entity);
         }
@@ -116,17 +123,17 @@ namespace Registry {
         return ();
     }
 
+    // --------------------------------
+    // Getters
+    // --------------------------------
+
     // @notice: Returns an entity if it exists
     func lookup_entity{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(id: felt) -> (
         value: felt
     ) {
-        let (value) = Registry_entities.read(key);
+        let (value) = Registry_entity_components.read(id);
         return (value=value);
     }
-
-    // --------------------------------
-    // Getters
-    // --------------------------------
 
     // @notice: Returns the address -> id or id -> address mapping of an entry
     // @param: key - address or id of the entry

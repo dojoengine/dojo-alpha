@@ -25,10 +25,10 @@ func Ownable_owner() -> (owner: felt) {
 
 namespace Ownable {
     //
-    // Initializer
+    // Initialize
     //
 
-    func initializer{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(owner: felt) {
+    func initialize{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(owner: felt) {
         _transfer_ownership(owner);
         return ();
     }

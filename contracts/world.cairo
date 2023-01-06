@@ -36,12 +36,14 @@ func ComponentValueSet(entity: felt, component_id: felt, data_len: felt, data: f
 //
 
 // @notice: General register function. This is called by the component or system to register itself with the world.
-// @param: address: the address of the entity
-// @param: id: a human readable id for the entity
+// @param: cls_hash: the address of the component / system
+// @param: calldata_len: the length of the component / system initialization calldata
+// @param: calldata: the component / system initialization calldata
+// @returns: the address of the component / system contract
 @external
 func register{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
     cls_hash: felt, calldata_len: felt, calldata: felt*
-) {
+) -> (address: felt) {
     alloc_locals;
 
     let (world_address) = get_contract_address();
@@ -57,23 +59,25 @@ func register{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
 
     let (is_component) = IERC165.supports_interface(address, COMPONENT_INTERFACE_ID);
     if (is_component == TRUE) {
+        let (caller_address) = get_caller_address();
         let (id) = IComponent.id(address);
+        IComponent.transfer_admin(address, caller_address);
         Registry.register(address, id);
-        return ();
+        return (address=address);
     }
 
     let (is_system) = IERC165.supports_interface(address, SYSTEM_INTERFACE_ID);
     if (is_system == TRUE) {
         let (id) = ISystem.id(address);
         Registry.register(address, id);
-        return ();
+        return (address=address);
     }
 
     with_attr error_message("World: must be either a component or a system") {
         assert 1 = 0;
     }
 
-    return ();
+    return (address=0);
 }
 
 // @notice: register a component value set

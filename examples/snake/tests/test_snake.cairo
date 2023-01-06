@@ -42,8 +42,8 @@ func test_move{syscall_ptr: felt*, range_check_ptr, pedersen_ptr: HashBuiltin*}(
     let (position_address) = IWorld.lookup(world_address, PositionID);
     let (move_address) = IWorld.lookup(world_address, MoveID);
 
-    let entity_id = 420;
-    let (_, current_position) = IPosition.get(position_address, entity_id);
+    let snake_id = 420;
+    let (_, current_position) = IPosition.get(position_address, snake_id);
 
     assert current_position.x = 0;
     assert current_position.y = 0;
@@ -52,9 +52,9 @@ func test_move{syscall_ptr: felt*, range_check_ptr, pedersen_ptr: HashBuiltin*}(
     assert next_position.x = 1;
     assert next_position.y = 0;
 
-    IMove.execute(move_address, entity_id, 1, next_position);
+    IMove.execute(move_address, snake_id, 1, next_position);
 
-    let (_, updated_position) = IPosition.get(position_address, entity_id);
+    let (_, updated_position) = IPosition.get(position_address, snake_id);
     assert updated_position.x = 1;
     assert updated_position.y = 0;
 
