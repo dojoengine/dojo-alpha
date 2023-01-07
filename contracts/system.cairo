@@ -8,7 +8,7 @@ from contracts.interfaces import IComponent, IWorld
 from contracts.libraries.registerable import Registerable
 from contracts.libraries.erc165 import ERC165
 
-// TODO: Compute component interface id
+// TODO: Compute system interface id
 const INTERFACE_ID = 0xbeef;
 
 namespace System {
@@ -34,14 +34,6 @@ namespace System {
         IComponent.set(component_address, calldata_len, calldata);
 
         return set_inner(entity_id, components_len - 1, components + 1, components_set_calldata_len - calldata_len - 1, components_set_calldata + calldata_len + 1);
-    }
-
-    // Spawn an entity with a set of components.
-    // [component_address_0, setdata_len_0, setdata_0, ..., component_address_n, setdata_len_n, setdata_n]
-    func spawn{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(components_len: felt, components: felt*, components_set_calldata_len: felt, components_set_calldata: felt*) -> (id: felt) {
-        let id = Registerable.spawn(components_len, components);
-        set_inner(id, components_len, components, components_set_calldata_len, components_set_calldata);
-        return (id=id);
     }
 
     func supports_interface{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(

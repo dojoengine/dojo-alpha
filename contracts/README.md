@@ -11,9 +11,6 @@ namespace IWorld {
     // Register an entity or component.
     func register(cls_hash: felt, calldata_len: felt, calldata: felt*) {
     }
-    // Spawn an entity.
-    func spawn(components_len: felt, components: felt*) -> (id: felt) {
-    }
     // Lookup an entity, component, or system.
     func lookup(key: felt) -> (value: felt) {
     }

@@ -20,9 +20,9 @@ from starkware.cairo.common.math import assert_not_zero
 func RegistryRegister(address: felt, id: felt) {
 }
 
-// Emitted when a new entity is spawned.
+// Emitted when a component is updated.
 @event
-func EntitySpawn(id: felt, components_len: felt, components: felt*) {
+func ComponentUpdate(id: felt, components_len: felt, components: felt*) {
 }
 
 // --------------------------------
@@ -81,26 +81,6 @@ namespace Registry {
 
         Registry_entity_components.write(entity_id, idx + 1, components[0]);
         return write_entity_inner(entity_id, idx + 1, components_len, components + 1);
-    }
-
-    func spawn{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
-        components_len: felt, components: felt*
-    ) -> (
-        id: felt
-    ) {
-        alloc_locals;
-
-        let (caller_address) = get_caller_address();
-
-        // Provision globally unique entity id.
-        let (id) = Registry_entity_count.read();
-        Registry_entity_count.write(id + 1);
-
-        // Store entities components.
-        Registry_entity_components.write(id, 0, components_len);
-        write_entity_inner(id, 0, components_len, components);
-
-        return (id=id);
     }
 
     func extend_entity{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(

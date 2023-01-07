@@ -4,6 +4,7 @@ from starkware.cairo.common.alloc import alloc
 from starkware.cairo.common.cairo_builtins import BitwiseBuiltin, HashBuiltin
 from starkware.cairo.common.bool import TRUE, FALSE
 from starkware.starknet.common.syscalls import get_caller_address, get_contract_address, deploy
+from starkware.cairo.common.math import assert_not_zero
 
 from contracts.interfaces import IComponent, IInitializable, ISystem
 from contracts.libraries.registry import Registry
@@ -23,12 +24,12 @@ from contracts.system import INTERFACE_ID as SYSTEM_INTERFACE_ID
 //
 
 // @notice: emitted when a component value is set
-// @param: entity: the entity the component value is set on
-// @param: component_id: the component id
+// @param: entity_id: the entity the component value is set on
+// @param: component_address: the component address
 // @param: data_len: the length of the data
 // @param: data: the data
 @event
-func ComponentValueSet(entity: felt, component_id: felt, data_len: felt, data: felt*) {
+func ComponentValueSet(entity_id: felt, component_address: felt, data_len: felt, data: felt*) {
 }
 
 //
@@ -86,16 +87,17 @@ func register{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
 // @param: data_len: the length of the data
 // @param: data: the data to set
 @external
-func register_component_value_set{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
-    entity_id: felt, component_id: felt, data_len: felt, data: felt*
+func after_component_set{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
+    entity_id: felt, data_len: felt, data: felt*
 ) {
     alloc_locals;
-    // TODO: check Component is registered in world
-    // Only can be called by Registered Component
+
+    let (caller_address) = get_caller_address();
+    assert_registered(caller_address);
 
     // set 0 here for now - we could pass an address in the future to set an address for the entity
     // Registry.set(0, entity_id);
-    ComponentValueSet.emit(entity_id, component_id, data_len, data);
+    ComponentValueSet.emit(entity_id, caller_address, data_len, data);
     return ();
 }
 
@@ -109,4 +111,13 @@ func lookup{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
     key: felt
 ) -> (value: felt) {
     return Registry.get(key);
+}
+
+
+func assert_registered{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(key: felt) {
+    let (value) = lookup(key);
+    with_attr error_message("World: component / system not registered") {
+        assert_not_zero(value);
+    }
+    return ();
 }

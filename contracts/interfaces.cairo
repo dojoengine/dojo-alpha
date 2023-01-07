@@ -8,9 +8,7 @@ namespace IWorld {
     }
     func register(cls_hash: felt, calldata_len: felt, calldata: felt*) -> (address: felt) {
     }
-    func spawn(components_len: felt, components: felt*) -> (id: felt) {
-    }
-    func register_component_value_set(entity: felt, component: felt, data_len: felt, data: felt*) {
+    func after_component_set(entity: felt, data_len: felt, data: felt*) {
     }
 }
 

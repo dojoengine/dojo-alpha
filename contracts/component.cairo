@@ -13,8 +13,6 @@ from contracts.libraries.writable import Writable
 
 // TODO: Compute component interface id
 const INTERFACE_ID = 0xdead;
-const ADMIN_ROLE = 420;
-const WRITER_ROLE = 69;
 
 @storage_var
 func Component_state(entity_id: felt, part_idx: felt) -> (part: felt) {
@@ -58,7 +56,7 @@ namespace Component {
         write_inner(entity_id, 0, data_len, data);
 
         let world_address = assert_world_address();
-        IWorld.register_component_value_set(world_address, entity_id, 'id', data_len, data);
+        IWorld.after_component_set(world_address, entity_id, data_len, data);
 
         return ();
     }
