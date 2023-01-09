@@ -56,7 +56,7 @@ namespace Component {
         write_inner(entity_id, 0, data_len, data);
 
         let world_address = assert_world_address();
-        IWorld.after_component_set(world_address, entity_id, data_len, data);
+        IWorld.on_component_set(world_address, entity_id, data_len, data);
 
         return ();
     }

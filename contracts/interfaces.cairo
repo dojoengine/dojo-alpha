@@ -8,7 +8,7 @@ namespace IWorld {
     }
     func register(cls_hash: felt, calldata_len: felt, calldata: felt*) -> (address: felt) {
     }
-    func after_component_set(entity: felt, data_len: felt, data: felt*) {
+    func on_component_set(entity: felt, data_len: felt, data: felt*) {
     }
 }
 

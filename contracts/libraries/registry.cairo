@@ -46,8 +46,8 @@ func Registry_storage(key: felt) -> (value: felt) {
 // --------------------------------
 
 namespace Registry {
-    // @notice: Registers a the component or system
-    // @param: address - the address of the the component or system
+    // @notice: Registers a component or system
+    // @param: address - the address of the component or system
     // @param: id - a human readable id for the component or system
     // @param: archetype - the archetype of the entity
     func register{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(

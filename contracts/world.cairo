@@ -87,7 +87,7 @@ func register{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
 // @param: data_len: the length of the data
 // @param: data: the data to set
 @external
-func after_component_set{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
+func on_component_set{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
     entity_id: felt, data_len: felt, data: felt*
 ) {
     alloc_locals;
