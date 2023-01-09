@@ -1,0 +1,10 @@
+[project]
+protostar-version = "0.9.1"
+lib-path = "lib"
+cairo-path = ["../.."]
+
+[contracts]
+position = ["src/components/Position.cairo"]
+consumable = ["src/components/Consumable.cairo"]
+chomp = ["src/systems/Chomp.cairo"]
+move = ["src/systems/Move.cairo"]
